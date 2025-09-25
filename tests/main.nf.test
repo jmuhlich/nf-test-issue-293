@@ -1,0 +1,12 @@
+nextflow_pipeline {
+
+    name "Test pipeline"
+    script "../main.nf"
+
+    test("first test") {
+        then {
+            assert snapshot([]).match()
+        }
+    }
+
+}
