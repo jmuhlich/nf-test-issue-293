@@ -1,0 +1,33 @@
+nextflow_pipeline {
+
+    name "Test getAllFilesFromDir"
+    script "./main.nf"
+    tag "getAllFilesFromDir"
+
+    test("getAllFilesFromDir") {
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+          // Use getAllFilesFromDir() to get a list of all files and folders from the output directory, minus the timestamped files
+          def stable_name       = getAllFilesFromDir(params.outdir, true, ['pipeline_info/execution_*.{html,txt}'], null, ['**'])
+          // Use getAllFilesFromDir() to get a list of all files and folders from the output directory, minus the timestamped files
+          def stable_name_again = getAllFilesFromDir(params.outdir, true, [''], null, ['stable/*'])
+          // Use getAllFilesFromDir() to get a list of all files from the output directory, minus the non-stable files
+          def stable_content    = getAllFilesFromDir(params.outdir, false, ['pipeline_info/execution_*.{html,txt}'], 'tests/getAllFilesFromDir/.nftignore', ['**'])
+          assert snapshot(
+            // Only snapshot name
+            stable_name*.name,
+            // Only snapshot name again
+            stable_name_again*.name,
+            // Snapshot content
+            stable_content,
+            // Capture file with includeGlobs
+          ).match()
+        }
+    }
+
+}
